@@ -10,7 +10,7 @@ var client = new Twitter({
 });
 
 var userdict = [];
-var params = {screen_name: 'dylanistrippin'};
+var params = {screen_name: 'ghiesenburg'};
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error) {
       for(var tweet in tweets){
@@ -62,24 +62,38 @@ var params = {screen_name: 'dylanistrippin'};
             var score = categories[index]['score'];
             var label = categories[index]['label'];
             var allLabels = label.split('/');
+            var count = 0
             allLabels.forEach(function(entry) {
               if (entry != '') {
-                categoryList.push(entry);
+                var multiplier = .9 + (.3*count/allLabels.length);
+                categoryList[entry] = score*multiplier;
+                count+=1
               }
             });
           }
           for(var item in categoryList){
-            if(userdict[categoryList[item]] != undefined){
-              userdict[categoryList[item]] += 1
+            if(userdict[item] != undefined){
+              userdict[item] += categoryList[item]
             }
             else{
-              userdict[categoryList[item]] = 1
+              userdict[item] = categoryList[item]
             }
           }
           //here we start to go through the items in categoryList
-          
-        }
+          var items = Object.keys(userdict).map(function(key) {
+              return [key, userdict[key]];
+          });
 
+          // Sort the array based on the second element
+          items.sort(function(first, second) {
+              return second[1] - first[1];
+          });
+
+          for(var item in items){
+            console.log(item +' '+ items[item])
+          }
+          console.log('***************\n***************')
+        }
       }
     }
   });
